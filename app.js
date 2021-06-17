@@ -1,5 +1,6 @@
 // NPM imports
 const express = require("express");
+const jwt = require('jsonwebtoken');
 var cors = require('cors');
 const multer = require('multer');
 const chalk = require('chalk');
@@ -100,7 +101,7 @@ app.use(express.json());
 // PARSING application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 // PARSING multipart/form-data
-const upload = multer();
+const multerdata = multer();
 
 // storage config
 const multerStorage = multer.diskStorage({
@@ -108,10 +109,17 @@ const multerStorage = multer.diskStorage({
     cb(null, 'public/storage/articles');
   },
   filename: (req, file, cb) => {
-    const ext = file.mimetype.split('/')[1];
-    cb(null, `${req.name}.${ext}`);
+    //const ext = file.mimetype.split('/')[1];
+    //console.log(file);
+    cb(null, file.originalname);
   }
 });
+
+var upload = multer({ storage: multerStorage });
+
+
+// Static contents
+app.use('/public', express.static('public'));
 
 // Test object
 
@@ -166,10 +174,12 @@ app.get('/sudaderas/', function (req, res) {
 });
 
 // Crear sudadera con imagen
-app.post('/sudaderas/', function (req, res) {
-  Sudaderas.create(req.body)
-    .then(newSudadera => {res.send(newSudadera);})
-    .catch(err => console.log(err));
+app.post('/sudaderas/', upload.single('image'), function (req, res) {
+  console.log(req.body);
+  res.send(200);
+  //Sudaderas.create(req.body)
+  //  .then(newSudadera => {res.send(newSudadera);})
+  //  .catch(err => console.log(err));
 
 });
 
